@@ -1,0 +1,189 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demo_arithmeticBrownianMotion</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-12-04"><meta name="DC.source" content="demo_arithmeticBrownianMotion.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">demo_arithmeticBrownianMotiondemo_ArithmeticBrownianMotion: simulation</a></li><li><a href="#3">SYNTAX:</a></li><li><a href="#4">INPUT:</a></li><li><a href="#5">EXAMPLE:</a></li><li><a href="#6">Simulate in [t0,t0+T]</a></li><li><a href="#7">Parameters for the Arithmetic Brownian Motion</a></li><li><a href="#8">Plot the simulated trajectories</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> demo_arithmeticBrownianMotion(M,N)
+</pre><h2>demo_arithmeticBrownianMotiondemo_ArithmeticBrownianMotion: simulation<a name="2"></a></h2><p>and properties of arithmetic Brownian Motion</p><h2>SYNTAX:<a name="3"></a></h2><pre>       demo_arithmeticBrownianMotion(M,N)</pre><h2>INPUT:<a name="4"></a></h2><pre>       M : Number of simulations
+       N : Number of steps in simulations</pre><h2>EXAMPLE:<a name="5"></a></h2><pre>   M = 1;    N = 100; demo_arithmeticBrownianMotion(M,N)
+   M = 25;   N = 100; demo_arithmeticBrownianMotion(M,N)
+   M = 100;  N = 100; demo_arithmeticBrownianMotion(M,N)
+   M = 1000; N = 100; demo_arithmeticBrownianMotion(M,N)</pre><h2>Simulate in [t0,t0+T]<a name="6"></a></h2><pre class="codeinput">t0 = 0.0;
+T  = 2.0;
+</pre><h2>Parameters for the Arithmetic Brownian Motion<a name="7"></a></h2><pre class="codeinput">B0    = 0.0;
+mu    = 1.0;
+sigma = 0.5;
+
+[t,B] = simulateArithmeticBrownianMotion(M,N,t0,B0,T,mu,sigma);
+</pre><h2>Plot the simulated trajectories<a name="8"></a></h2><pre class="codeinput"><span class="keyword">if</span> (M &lt; 30)
+
+    plot(t,B');
+    axis(<span class="string">'tight'</span>);
+    xlabel(<span class="string">'t'</span>); ylabel(<span class="string">'B(t)'</span>)
+
+<span class="keyword">else</span>   <span class="comment">% sufficiently large sample for E[BT] and stdev[BT]</span>
+
+    BT  = B(:,end);  <span class="comment">% final value of each trajectory</span>
+
+    subplot(1,10,8:10);
+    modelPdf = @(x)(normpdf(x,mu*T,sigma*sqrt(T)));
+
+    scale = 0;
+    graphicalComparisonPdf(BT,modelPdf,scale,min(B(:)), max(B(:)))
+    view(90,-90);
+
+    <span class="comment">% plot trajectories</span>
+    subplot(1,10,1:6);
+    plot(t,B',<span class="string">'LineWidth'</span>,1);
+    axis(<span class="string">'tight'</span>);
+    xlabel(<span class="string">'t'</span>); ylabel(<span class="string">'B(t)'</span>)
+
+    hold <span class="string">on</span>
+
+    <span class="comment">% plot stdev[B(t)]</span>
+    expected_B = B0 + mu*t;
+    plot(t,expected_B,<span class="string">'k'</span>,<span class="string">'LineWidth'</span>,3);
+
+    <span class="comment">% plot stdev[B(t)]</span>
+    std_B = sigma*sqrt(t);
+    alpha = 2;
+    plot(t,expected_B - alpha*std_B,<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,3);
+    plot(t,expected_B + alpha*std_B,<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,3);
+
+    hold <span class="string">off</span>
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="demo_arithmeticBrownianMotion_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function demo_arithmeticBrownianMotion(M,N)
+%% demo_arithmeticBrownianMotiondemo_ArithmeticBrownianMotion: simulation
+% and properties of arithmetic Brownian Motion
+%
+%%  SYNTAX:
+%         demo_arithmeticBrownianMotion(M,N)
+%
+%%  INPUT: 
+%         M : Number of simulations
+%         N : Number of steps in simulations
+%  
+%%  EXAMPLE:
+%     M = 1;    N = 100; demo_arithmeticBrownianMotion(M,N)
+%     M = 25;   N = 100; demo_arithmeticBrownianMotion(M,N)
+%     M = 100;  N = 100; demo_arithmeticBrownianMotion(M,N)
+%     M = 1000; N = 100; demo_arithmeticBrownianMotion(M,N)
+%
+
+%% Simulate in [t0,t0+T]
+t0 = 0.0;  
+T  = 2.0;            
+
+%% Parameters for the Arithmetic Brownian Motion
+B0    = 0.0;
+mu    = 1.0;
+sigma = 0.5;
+
+[t,B] = simulateArithmeticBrownianMotion(M,N,t0,B0,T,mu,sigma);
+
+%% Plot the simulated trajectories 
+if (M < 30) 
+
+    plot(t,B'); 
+    axis('tight');
+    xlabel('t'); ylabel('B(t)')
+
+else   % sufficiently large sample for E[BT] and stdev[BT]
+    
+    BT  = B(:,end);  % final value of each trajectory
+    
+    subplot(1,10,8:10);
+    modelPdf = @(x)(normpdf(x,mu*T,sigma*sqrt(T)));
+    
+    scale = 0; 
+    graphicalComparisonPdf(BT,modelPdf,scale,min(B(:)), max(B(:)))
+    view(90,-90);
+    
+    % plot trajectories
+    subplot(1,10,1:6);
+    plot(t,B','LineWidth',1);   
+    axis('tight');
+    xlabel('t'); ylabel('B(t)')
+
+    hold on
+    
+    % plot stdev[B(t)]
+    expected_B = B0 + mu*t; 
+    plot(t,expected_B,'k','LineWidth',3);
+
+    % plot stdev[B(t)]
+    std_B = sigma*sqrt(t);
+    alpha = 2;
+    plot(t,expected_B - alpha*std_B,'b','LineWidth',3);
+    plot(t,expected_B + alpha*std_B,'b','LineWidth',3);
+    
+    hold off
+end
+
+
+##### SOURCE END #####
+--></body></html>

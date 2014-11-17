@@ -1,0 +1,175 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demoCode_priceEuropeanCallMC</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-10-28"><meta name="DC.source" content="demoCode_priceEuropeanCallMC.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">demoCode_priceEuropeanCallMC: MC estimate of the price of a European call option</a></li><li><a href="#3">Parameters of the European call option</a></li><li><a href="#4">Generate M x N samples from N(0,1)</a></li><li><a href="#5">Simulate M trajectories in [t0,t0+T] in N time-steps of size deltaT</a></li><li><a href="#6">Value of the underlying at maturity</a></li><li><a href="#7">Payoff</a></li><li><a href="#8">MC estimate of the price</a></li><li><a href="#9">MC estimate of the error</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> demoCode_priceEuropeanCallMC
+</pre><h2>demoCode_priceEuropeanCallMC: MC estimate of the price of a European call option<a name="2"></a></h2><h2>Parameters of the European call option<a name="3"></a></h2><pre class="codeinput">S0    = 100;  <span class="comment">% initial price of the underlying</span>
+K     = 90;   <span class="comment">% strike</span>
+r     = 0.05; <span class="comment">% risk-free interest rate</span>
+T     = 2;    <span class="comment">% maturity</span>
+sigma = 0.4;  <span class="comment">% volatility</span>
+</pre><h2>Generate M x N samples from N(0,1)<a name="4"></a></h2><pre class="codeinput">M = 4;   <span class="comment">% simulate M trajectories</span>
+N = 5;   <span class="comment">% N time-steps</span>
+
+X = randn(M,N)
+</pre><pre class="codeoutput">
+X =
+
+   -1.0212   -1.2310   -0.5755   -0.3968   -0.1086
+    1.8060   -0.8752    0.7994    0.9670   -0.8486
+   -0.8858   -0.5873   -1.1807    1.0196    0.3894
+   -0.3422    1.2380   -0.3404   -0.3183    0.4151
+
+</pre><h2>Simulate M trajectories in [t0,t0+T] in N time-steps of size deltaT<a name="5"></a></h2><pre class="codeinput">deltaT = T/N;
+aux    = [S0*ones(M,1) exp((r-0.5*sigma^2)*deltaT+sigma*sqrt(deltaT)*X)]
+S      = cumprod(aux,2)
+</pre><pre class="codeoutput">
+aux =
+
+  100.0000    0.7631    0.7237    0.8542    0.8937    0.9613
+  100.0000    1.5603    0.7918    1.2095    1.2619    0.7972
+  100.0000    0.7897    0.8516    0.7329    1.2788    1.0904
+  100.0000    0.9061    1.3515    0.9066    0.9116    1.0975
+
+
+S =
+
+  100.0000   76.3114   55.2246   47.1727   42.1578   40.5264
+  100.0000  156.0315  123.5496  149.4359  188.5750  150.3255
+  100.0000   78.9709   67.2552   49.2941   63.0377   68.7337
+  100.0000   90.6122  122.4595  111.0163  101.2057  111.0722
+
+</pre><h2>Value of the underlying at maturity<a name="6"></a></h2><pre class="codeinput">ST = S(:,end) <span class="comment">% Last value of the simulated trajectories</span>
+</pre><pre class="codeoutput">
+ST =
+
+   40.5264
+  150.3255
+   68.7337
+  111.0722
+
+</pre><h2>Payoff<a name="7"></a></h2><pre class="codeinput">payoff = max(ST-K,0)  <span class="comment">% European call option</span>
+</pre><pre class="codeoutput">
+payoff =
+
+         0
+   60.3255
+         0
+   21.0722
+
+</pre><h2>MC estimate of the price<a name="8"></a></h2><pre class="codeinput">discountFactor = exp(-r*T);
+price_MC = discountFactor*mean(payoff)
+</pre><pre class="codeoutput">
+price_MC =
+
+   18.4129
+
+</pre><h2>MC estimate of the error<a name="9"></a></h2><pre class="codeinput">stdev_MC = discountFactor*std(payoff)/sqrt(M)
+</pre><pre class="codeoutput">
+stdev_MC =
+
+   12.8676
+
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function demoCode_priceEuropeanCallMC
+%% demoCode_priceEuropeanCallMC: MC estimate of the price of a European call option
+%          
+
+%% Parameters of the European call option
+S0    = 100;  % initial price of the underlying
+K     = 90;   % strike
+r     = 0.05; % risk-free interest rate
+T     = 2;    % maturity 
+sigma = 0.4;  % volatility
+
+%% Generate M x N samples from N(0,1)
+M = 4;   % simulate M trajectories
+N = 5;   % N time-steps
+
+X = randn(M,N) 
+
+%% Simulate M trajectories in [t0,t0+T] in N time-steps of size deltaT
+deltaT = T/N;
+aux    = [S0*ones(M,1) exp((r-0.5*sigma^2)*deltaT+sigma*sqrt(deltaT)*X)]
+S      = cumprod(aux,2)
+
+%% Value of the underlying at maturity 
+ST = S(:,end) % Last value of the simulated trajectories
+
+%% Payoff 
+payoff = max(ST-K,0)  % European call option
+
+%% MC estimate of the price
+discountFactor = exp(-r*T);
+price_MC = discountFactor*mean(payoff)
+
+%% MC estimate of the error
+stdev_MC = discountFactor*std(payoff)/sqrt(M)
+
+
+##### SOURCE END #####
+--></body></html>

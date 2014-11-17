@@ -1,0 +1,224 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demo_fit2pdf</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-08-17"><meta name="DC.source" content="demo_fit2pdf.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">demo_fit2pdf: model calibration using Maximum Likelihood</a></li><li><a href="#3">Sample</a></li><li><a href="#4">Gaussian fit</a></li><li><a href="#5">Student's t fit</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> demo_fit2pdf
+</pre><h2>demo_fit2pdf: model calibration using Maximum Likelihood<a name="2"></a></h2><h2>Sample<a name="3"></a></h2><pre class="codeinput">data = load(<span class="string">'closingPrices_IBM_GOOG_SI_2007_07_01_2013_06_30.txt'</span>);
+
+<span class="comment">% time series of daily closing prices</span>
+S_GOOG = data(:,2)';         <span class="comment">% row vector [N,1]</span>
+
+<span class="comment">% time series of daily returns</span>
+r_GOOG = log(S_GOOG(2:end)./S_GOOG(1:end-1));   <span class="comment">% row vector [N-1,1]</span>
+</pre><h2>Gaussian fit<a name="4"></a></h2><pre class="codeinput"><span class="comment">% seed for the optimization</span>
+mu0 = 0.0;
+sigma0 = 1.0;
+
+<span class="comment">% uncostrained optimization (simplex)</span>
+[LL, mu,sigma] = fit2pdf(r_GOOG,@normpdf,[mu0,sigma0])
+
+<span class="comment">% compare to sample mean and stdev</span>
+mean(r_GOOG)
+std(r_GOOG,1)
+
+<span class="comment">% model pdf</span>
+modelPdf = @(x)(normpdf(x,mu,sigma));
+
+<span class="comment">% graphical comparison of the fit</span>
+figure(1); clf
+graphicalComparisonPdf(r_GOOG,modelPdf)
+title(<span class="string">'Normal fit for log-returns GOOG'</span>)
+legend(<span class="string">'scaled histogram'</span>,<span class="string">'normpdf(r_{GOOG})'</span>)
+</pre><pre class="codeoutput">
+LL =
+
+   2.445380584469096
+
+
+mu =
+
+     3.474675416799983e-04
+
+
+sigma =
+
+   0.021000897123258
+
+
+ans =
+
+     3.358174571778677e-04
+
+
+ans =
+
+   0.020977170567215
+
+</pre><img vspace="5" hspace="5" src="demo_fit2pdf_01.png" alt=""> <h2>Student's t fit<a name="5"></a></h2><pre class="codeinput"><span class="comment">% seed for the optimization</span>
+mu0    = mean(r_GOOG);                  <span class="comment">% match first moment</span>
+nu0    = 5;
+sigma0 = sqrt(var(r_GOOG)*(nu0-2)/nu0); <span class="comment">% match second moment</span>
+
+<span class="comment">% costrained optimization</span>
+[LL, mu,sigma,nu] = fit2pdf_con(r_GOOG,@locationScaleTpdf,[mu0,sigma0,nu0],<span class="keyword">...</span>
+                                [-Inf 1e-5 1e-5], [Inf Inf Inf])
+
+<span class="comment">% model pdf</span>
+modelPdf = @(x)(locationScaleTpdf(x,mu,sigma,nu));
+
+<span class="comment">% graphical comparison of the fit</span>
+figure(2); clf
+graphicalComparisonPdf(r_GOOG,modelPdf)
+title(<span class="string">'t Student fit for log-returns GOOG'</span>)
+legend(<span class="string">'scaled histogram'</span>,sprintf(<span class="string">'tpdf(r_{GOOG}),%s=%.3g)'</span>,<span class="string">'\nu'</span>,nu))
+</pre><pre class="codeoutput">
+Local minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the default value of the function tolerance,
+and constraints are satisfied to within the default value of the constraint tolerance.
+
+
+
+
+LL =
+
+   2.590546624680620
+
+
+mu =
+
+     7.590496884822403e-04
+
+
+sigma =
+
+   0.012315056253360
+
+
+nu =
+
+   2.755242012600202
+
+</pre><img vspace="5" hspace="5" src="demo_fit2pdf_02.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function demo_fit2pdf
+%% demo_fit2pdf: model calibration using Maximum Likelihood
+%
+
+%% Sample
+ 
+data = load('closingPrices_IBM_GOOG_SI_2007_07_01_2013_06_30.txt');
+
+% time series of daily closing prices
+S_GOOG = data(:,2)';         % row vector [N,1]
+ 
+% time series of daily returns
+r_GOOG = log(S_GOOG(2:end)./S_GOOG(1:end-1));   % row vector [N-1,1]
+
+%% Gaussian fit
+
+% seed for the optimization
+mu0 = 0.0; 
+sigma0 = 1.0;
+
+% uncostrained optimization (simplex)
+[LL, mu,sigma] = fit2pdf(r_GOOG,@normpdf,[mu0,sigma0])
+
+% compare to sample mean and stdev
+mean(r_GOOG)
+std(r_GOOG,1)  
+
+% model pdf
+modelPdf = @(x)(normpdf(x,mu,sigma));
+
+% graphical comparison of the fit
+figure(1); clf
+graphicalComparisonPdf(r_GOOG,modelPdf)
+title('Normal fit for log-returns GOOG')
+legend('scaled histogram','normpdf(r_{GOOG})')
+
+%% Student's t fit
+
+% seed for the optimization
+mu0    = mean(r_GOOG);                  % match first moment
+nu0    = 5; 
+sigma0 = sqrt(var(r_GOOG)*(nu0-2)/nu0); % match second moment
+
+% costrained optimization
+[LL, mu,sigma,nu] = fit2pdf_con(r_GOOG,@locationScaleTpdf,[mu0,sigma0,nu0],...
+                                [-Inf 1e-5 1e-5], [Inf Inf Inf])
+
+% model pdf
+modelPdf = @(x)(locationScaleTpdf(x,mu,sigma,nu));
+
+% graphical comparison of the fit
+figure(2); clf
+graphicalComparisonPdf(r_GOOG,modelPdf)
+title('t Student fit for log-returns GOOG')
+legend('scaled histogram',sprintf('tpdf(r_{GOOG}),%s=%.3g)','\nu',nu))
+##### SOURCE END #####
+--></body></html>

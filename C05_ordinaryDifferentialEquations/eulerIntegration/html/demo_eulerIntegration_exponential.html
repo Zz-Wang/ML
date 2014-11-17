@@ -1,0 +1,154 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demo_eulerIntegration_exponential</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-07-13"><meta name="DC.source" content="demo_eulerIntegration_exponential.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">demo_eulerIntegration_exponential: Integration of ODE for the exponential</a></li><li><a href="#3">Parameters for the integration grid</a></li><li><a href="#4">Function that gives the value of the derivative</a></li><li><a href="#5">Integrate the ODE (coarse integration grid)</a></li><li><a href="#6">Plot the results</a></li><li><a href="#7">Integrate the ODE using a finer integration grid</a></li><li><a href="#8">Plot the results</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> demo_eulerIntegration_exponential()
+</pre><h2>demo_eulerIntegration_exponential: Integration of ODE for the exponential<a name="2"></a></h2><p>Exponential <img src="demo_eulerIntegration_exponential_eq91955.png" alt="$$ dM(t) = r M(t) dt $$"></p><h2>Parameters for the integration grid<a name="3"></a></h2><pre class="codeinput"><span class="comment">% initial conditions</span>
+t0 = 0;  <span class="comment">% initial time</span>
+M0 = 100; <span class="comment">% initial value of the trajectory</span>
+
+<span class="comment">% length of integration interval</span>
+T  = 50;
+</pre><h2>Function that gives the value of the derivative<a name="4"></a></h2><p><img src="demo_eulerIntegration_exponential_eq29710.png" alt="$$ a(t,M(t)) = r M(t) $$"></p><pre class="codeinput">r = 0.05;        <span class="comment">% interest rate</span>
+a = @(t,M)(r*M);
+</pre><h2>Integrate the ODE (coarse integration grid)<a name="5"></a></h2><pre class="codeinput">N = 5;  <span class="comment">% coarse grid</span>
+[t,M_euler] = eulerIntegration(t0,M0,a,T,N);
+</pre><h2>Plot the results<a name="6"></a></h2><pre class="codeinput"><span class="comment">% exact solution</span>
+nPlot = 1000;
+tPlot = linspace(t0,t0+T,nPlot);
+M     = M0*exp(r*(tPlot-t0));    <span class="comment">% exact solution</span>
+
+<span class="comment">% compare the exact solution and the approximation by the Euler method</span>
+figure(1); clf
+plot(tPlot,M,<span class="string">'k'</span>,t,M_euler,<span class="string">'bo'</span>,<span class="string">'LineStyle'</span>,<span class="string">'-'</span>);
+xlabel(<span class="string">'t'</span>); ylabel(<span class="string">'f(t)'</span>); legend(<span class="string">'M(t)'</span>,<span class="string">'M_{euler}(t)'</span>,0);
+</pre><img vspace="5" hspace="5" src="demo_eulerIntegration_exponential_01.png" alt=""> <h2>Integrate the ODE using a finer integration grid<a name="7"></a></h2><pre class="codeinput">N = 50;  <span class="comment">% finer integration grid</span>
+[t,M_euler] = eulerIntegration(t0,M0,a,T,N);
+</pre><h2>Plot the results<a name="8"></a></h2><pre class="codeinput"><span class="comment">% compare the exact solution and the approximation given by the Euler method</span>
+figure(2); clf
+plot(tPlot,M,<span class="string">'k'</span>,t,M_euler,<span class="string">'bo'</span>,<span class="string">'LineStyle'</span>,<span class="string">'-'</span>);
+xlabel(<span class="string">'t'</span>); ylabel(<span class="string">'f(t)'</span>); legend(<span class="string">'M(t)'</span>,<span class="string">'M_{euler}(t)'</span>,0);
+</pre><img vspace="5" hspace="5" src="demo_eulerIntegration_exponential_02.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function demo_eulerIntegration_exponential()
+%%  demo_eulerIntegration_exponential: Integration of ODE for the exponential  
+%
+% Exponential 
+% $$ dM(t) = r M(t) dt $$
+
+%% Parameters for the integration grid
+
+% initial conditions
+t0 = 0;  % initial time 
+M0 = 100; % initial value of the trajectory
+
+% length of integration interval
+T  = 50; 
+
+%% Function that gives the value of the derivative 
+%
+% $$ a(t,M(t)) = r M(t) $$
+
+r = 0.05;        % interest rate
+a = @(t,M)(r*M);
+
+
+%% Integrate the ODE (coarse integration grid)
+
+N = 5;  % coarse grid
+[t,M_euler] = eulerIntegration(t0,M0,a,T,N);
+
+
+%% Plot the results
+
+% exact solution
+nPlot = 1000; 
+tPlot = linspace(t0,t0+T,nPlot);   
+M     = M0*exp(r*(tPlot-t0));    % exact solution
+
+% compare the exact solution and the approximation by the Euler method 
+figure(1); clf
+plot(tPlot,M,'k',t,M_euler,'bo','LineStyle','-');
+xlabel('t'); ylabel('f(t)'); legend('M(t)','M_{euler}(t)',0);
+
+
+%% Integrate the ODE using a finer integration grid
+
+N = 50;  % finer integration grid
+[t,M_euler] = eulerIntegration(t0,M0,a,T,N);
+
+
+%% Plot the results
+
+% compare the exact solution and the approximation given by the Euler method 
+figure(2); clf
+plot(tPlot,M,'k',t,M_euler,'bo','LineStyle','-');
+xlabel('t'); ylabel('f(t)'); legend('M(t)','M_{euler}(t)',0);
+
+
+
+##### SOURCE END #####
+--></body></html>

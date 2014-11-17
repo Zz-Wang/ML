@@ -1,0 +1,195 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demo_FourierTransform</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-07-13"><meta name="DC.source" content="demo_FourierTransform.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Parameters for the simulation</a></li><li><a href="#4">Simusoidal time series</a></li><li><a href="#5">Gaussian white noise</a></li><li><a href="#6">Simusoidal time series contaminated with Gaussian white noise</a></li><li><a href="#8">Auxiliary function</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> demo_FourierTransform()
+</pre><pre class="codeinput"><span class="comment">%%demo_fourierTransform: FT of a sine, GWM and a contaminated sin</span>
+<span class="comment">%</span>
+</pre><h2>Parameters for the simulation<a name="3"></a></h2><pre class="codeinput">N  = 2^12;  <span class="comment">% Number of time steps</span>
+t0 = 0;     <span class="comment">% initial time</span>
+T  = 50;    <span class="comment">% length of interval</span>
+</pre><h2>Simusoidal time series<a name="4"></a></h2><pre class="codeinput">t = linspace(t0,t0+T,N)'; <span class="comment">% sampling times</span>
+
+w1 = 10; w2 = 12;                   <span class="comment">% frequencis</span>
+f = 0.4*sin(w1*t) + 0.6*sin(w2*t);  <span class="comment">% combination of sinusoidal time series</span>
+
+<span class="comment">% Fourier transform</span>
+FT_f = fft(f)/N;        <span class="comment">% discrete Fourier transform</span>
+powerSpectrum = abs(fftshift(FT_f)).^2;
+
+<span class="comment">% plot the results</span>
+figure(1);
+auxPlot(t,f,N,T,powerSpectrum)
+AXIS_1 = [-20 20 0 1.2*max(powerSpectrum)];
+axis(AXIS_1);
+title(<span class="string">'sinusoidal signal'</span>)
+</pre><img vspace="5" hspace="5" src="demo_FourierTransform_01.png" alt=""> <h2>Gaussian white noise<a name="5"></a></h2><pre class="codeinput">X = randn(N,1);
+
+<span class="comment">% Fourier transform</span>
+FT_X = fft(X)/N;        <span class="comment">% discrete Fourier transform</span>
+powerSpectrum = abs(fftshift(FT_X)).^2;
+
+<span class="comment">% Plot the results</span>
+figure(2);
+auxPlot(t,X,N,T,powerSpectrum)
+title(<span class="string">'Gaussian white noise'</span>)
+axis(<span class="string">'tight'</span>);
+</pre><img vspace="5" hspace="5" src="demo_FourierTransform_02.png" alt=""> <h2>Simusoidal time series contaminated with Gaussian white noise<a name="6"></a></h2><pre class="codeinput">noiseAmplitude = 2.0;
+f = f + noiseAmplitude*X;
+
+<span class="comment">% Fourier transform</span>
+FT_f = fft(f)/N;        <span class="comment">% discrete Fourier transform</span>
+powerSpectrum = abs(fftshift(FT_f)).^2;
+
+<span class="comment">% Plot the results</span>
+figure(3);
+auxPlot(t,f,N,T,powerSpectrum)
+axis(AXIS_1);
+title(<span class="string">'sinusoidal signal contaminated with GWN'</span>)
+</pre><img vspace="5" hspace="5" src="demo_FourierTransform_03.png" alt=""> <pre class="codeinput"><span class="keyword">end</span>
+</pre><h2>Auxiliary function<a name="8"></a></h2><pre class="codeinput"><span class="keyword">function</span> auxPlot(t,f,N,T,powerSpectrum)
+subplot(2,1,1);
+nPlot = 1000; plot(t(1:nPlot),f(1:nPlot));
+xlabel(<span class="string">'t'</span>); ylabel(<span class="string">'f(t)'</span>);
+axis(<span class="string">'tight'</span>);
+subplot(2,1,2);
+wPlot = pi*N/T*linspace(-1,1,N);
+plot(wPlot,powerSpectrum)
+xlabel(<span class="string">'w'</span>); ylabel(<span class="string">'FT'</span>);
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function demo_FourierTransform()
+%%demo_fourierTransform: FT of a sine, GWM and a contaminated sin
+%
+%% Parameters for the simulation
+
+N  = 2^12;  % Number of time steps
+t0 = 0;     % initial time
+T  = 50;    % length of interval
+
+%% Simusoidal time series
+
+t = linspace(t0,t0+T,N)'; % sampling times
+
+w1 = 10; w2 = 12;                   % frequencis
+f = 0.4*sin(w1*t) + 0.6*sin(w2*t);  % combination of sinusoidal time series
+
+% Fourier transform 
+FT_f = fft(f)/N;        % discrete Fourier transform
+powerSpectrum = abs(fftshift(FT_f)).^2;   
+
+% plot the results
+figure(1);
+auxPlot(t,f,N,T,powerSpectrum)
+AXIS_1 = [-20 20 0 1.2*max(powerSpectrum)]; 
+axis(AXIS_1);
+title('sinusoidal signal')
+
+%%   Gaussian white noise
+X = randn(N,1);
+
+% Fourier transform 
+FT_X = fft(X)/N;        % discrete Fourier transform
+powerSpectrum = abs(fftshift(FT_X)).^2;   
+
+% Plot the results 
+figure(2);
+auxPlot(t,X,N,T,powerSpectrum)
+title('Gaussian white noise')
+axis('tight');
+
+%%  Simusoidal time series contaminated with Gaussian white noise
+noiseAmplitude = 2.0; 
+f = f + noiseAmplitude*X;
+
+% Fourier transform 
+FT_f = fft(f)/N;        % discrete Fourier transform
+powerSpectrum = abs(fftshift(FT_f)).^2;   
+
+% Plot the results 
+figure(3);
+auxPlot(t,f,N,T,powerSpectrum)
+axis(AXIS_1);
+title('sinusoidal signal contaminated with GWN')
+
+end
+
+
+%% Auxiliary function
+function auxPlot(t,f,N,T,powerSpectrum)
+subplot(2,1,1); 
+nPlot = 1000; plot(t(1:nPlot),f(1:nPlot));
+xlabel('t'); ylabel('f(t)');
+axis('tight');
+subplot(2,1,2);
+wPlot = pi*N/T*linspace(-1,1,N);
+plot(wPlot,powerSpectrum)
+xlabel('w'); ylabel('FT');
+end
+
+##### SOURCE END #####
+--></body></html>

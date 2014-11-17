@@ -1,0 +1,394 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demo_MonteCarloSimulationVaR</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-11-10"><meta name="DC.source" content="demo_MonteCarloSimulationVaR.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">demo_MonteCarloSimulationVaR: Monte Carlo simulation for VaR</a></li><li><a href="#3">Load the data</a></li><li><a href="#4">Select data in the recent past</a></li><li><a href="#5">Compute historical log returns for the specified time horizon (DeltaT)</a></li><li><a href="#6">Student's t fit for the marginals of the log returns</a></li><li><a href="#7">Gaussian copula for the joint distribution of log returns</a></li><li><a href="#8">Portfolio composition</a></li><li><a href="#9">Portfolio value at t0</a></li><li><a href="#10">Value of the European call option on IBM</a></li><li><a href="#11">Value of an Asian call option on the arithmetic mean of Google</a></li><li><a href="#12">Value of the portfolio at t0</a></li><li><a href="#13">Monte Carlo simulation</a></li><li><a href="#14">Simulate the log returns from the multivariate model</a></li><li><a href="#15">Simulate the prices of the assets at t0 + DeltaT</a></li><li><a href="#16">Simulate the prices of the derivatives at t0 + DeltaT</a></li><li><a href="#18">IBM:  Call option</a></li><li><a href="#19">GOOG: Call on the arithmetic mean</a></li><li><a href="#21">Simulated portfolio value at t0 + DeltaT</a></li><li><a href="#22">Simulated losses</a></li><li><a href="#23">Risk measures</a></li><li><a href="#24">Risk measures as a percentage of the current portfolio value</a></li><li><a href="#25">Plot the results</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> demo_MonteCarloSimulationVaR
+</pre><h2>demo_MonteCarloSimulationVaR: Monte Carlo simulation for VaR<a name="2"></a></h2><h2>Load the data<a name="3"></a></h2><pre class="codeinput">S = load(<span class="string">'closingPrices_IBM_GOOG_SI_2007_07_01_2013_06_30.txt'</span>);
+</pre><h2>Select data in the recent past<a name="4"></a></h2><pre class="codeinput">N  = 500;
+
+S_IBM   = S(end-N:end,1);
+S0_IBM  = S_IBM(end);
+
+S_GOOG  = S(end-N:end,2);
+S0_GOOG = S_GOOG(end);
+</pre><h2>Compute historical log returns for the specified time horizon (DeltaT)<a name="5"></a></h2><pre class="codeinput"><span class="comment">% horizon for the risk measures (VaR, ES)</span>
+horizon = 5;
+
+indices = N+1:-1:horizon+1;          <span class="comment">% overlapping intervals</span>
+<span class="comment">% indices = N+1:-horizon:horizon+1;  % non-overlapping intervals</span>
+indices = indices(end:-1:1);
+
+<span class="comment">% New sample size</span>
+N = length(indices);
+
+r_IBM  = log(S_IBM(indices)  ./ S_IBM(indices-horizon));
+r_GOOG = log(S_GOOG(indices) ./ S_GOOG(indices-horizon));
+</pre><h2>Student's t fit for the marginals of the log returns<a name="6"></a></h2><pre class="codeinput"><span class="comment">% Degrees of freedom: seed for the optimization</span>
+nu0 = 5;
+
+<span class="comment">% Student's t fit for IBM</span>
+[mu_IBM,sigma_IBM,nu_IBM,modelPdf_IBM,modelCdf_IBM,modelInv_IBM] = <span class="keyword">...</span>
+    fit2StudentT(r_IBM,nu0);
+
+<span class="comment">% Student's t fit for GOOG</span>
+[mu_GOOG,sigma_GOOG,nu_GOOG,modelPdf_GOOG,modelCdf_GOOG,modelInv_GOOG] = <span class="keyword">...</span>
+    fit2StudentT(r_GOOG,nu0);
+</pre><pre class="codeoutput">
+Local minimum possible. Constraints satisfied.
+
+fmincon stopped because the size of the current step is less than
+the default value of the step size tolerance and constraints are 
+satisfied to within the default value of the constraint tolerance.
+
+
+
+
+Local minimum possible. Constraints satisfied.
+
+fmincon stopped because the size of the current step is less than
+the default value of the step size tolerance and constraints are 
+satisfied to within the default value of the constraint tolerance.
+
+
+
+</pre><h2>Gaussian copula for the joint distribution of log returns<a name="7"></a></h2><pre class="codeinput"><span class="comment">% Transform to U[0,1] marginals</span>
+u_IBM  = modelCdf_IBM(r_IBM);
+u_GOOG = modelCdf_GOOG(r_GOOG);
+
+<span class="comment">% Gaussian copula fit</span>
+rho = corr([norminv(u_IBM) norminv(u_GOOG)]);
+</pre><h2>Portfolio composition<a name="8"></a></h2><pre class="codeinput">c_IBM_asset        = 500;  <span class="comment">% IBM shares</span>
+c_GOOG_asset       = 200;  <span class="comment">% GOOG shares</span>
+c_IBM_call         = 5000; <span class="comment">% European call on IBM</span>
+c_GOOG_asianCallAM = 2000; <span class="comment">% Arithmetic mean Asian call on GOOG</span>
+</pre><h2>Portfolio value at t0<a name="9"></a></h2><h2>Value of the European call option on IBM<a name="10"></a></h2><pre class="codeinput">r = 0.01;  <span class="comment">% risk-free interest rate</span>
+T = 1;     <span class="comment">% time to maturity</span>
+K = 180;   <span class="comment">% Strike</span>
+
+nDaysInYear = 252;  <span class="comment">% number of trading days in a year</span>
+<span class="comment">% sigma_IBM   = sqrt(nDaysInYear/horizon)*std(r_IBM); % annualized historical volatity</span>
+sigma_IBM   = 0.16;                                 <span class="comment">% implied volatility in a call on IBM</span>
+
+payoff_call    = @(ST)(max(ST-K,0));
+price_IBM_call = priceEuropeanOption(S0_IBM,r,T,sigma_IBM,payoff_call)
+</pre><pre class="codeoutput">
+price_IBM_call =
+
+   19.3279
+
+</pre><h2>Value of an Asian call option on the arithmetic mean of Google<a name="11"></a></h2><pre class="codeinput">N_AM = 6;    <span class="comment">% Number of monitoring times for the arithmetic mean</span>
+T    = 0.5;  <span class="comment">% Time to maturity</span>
+M_AM = 1e3;  <span class="comment">% Number of simulated trajectories</span>
+K    = 880;  <span class="comment">% Strike of the Asian arithmetic mean call option</span>
+
+sigma_GOOG   = sqrt(nDaysInYear/horizon)*std(r_GOOG); <span class="comment">% annualized historical volatity</span>
+
+[price_GOOG_asianCallAM,stdev_MC] = <span class="keyword">...</span>
+    priceAsianArithmeticMeanCallMC_controlVariate(S0_GOOG,K,r,T,sigma_GOOG,M_AM,N_AM)
+</pre><pre class="codeoutput">
+price_GOOG_asianCallAM =
+
+   43.2664
+
+
+stdev_MC =
+
+    0.0605
+
+</pre><h2>Value of the portfolio at t0<a name="12"></a></h2><pre class="codeinput">P0 = c_IBM_asset        * S0_IBM         + <span class="keyword">...</span>
+     c_IBM_call         * price_IBM_call + <span class="keyword">...</span>
+     c_GOOG_asset       * S0_GOOG        + <span class="keyword">...</span>
+     c_GOOG_asianCallAM * price_GOOG_asianCallAM
+</pre><pre class="codeoutput">
+P0 =
+
+   4.5480e+05
+
+</pre><h2>Monte Carlo simulation<a name="13"></a></h2><pre class="codeinput"><span class="comment">% Simulate M scenarios</span>
+M = 1e3;
+</pre><h2>Simulate the log returns from the multivariate model<a name="14"></a></h2><pre class="codeinput"><span class="comment">% Student's t marginals + Gaussian copula</span>
+
+<span class="comment">% Gaussian copula sample</span>
+U = gaussianCopulaRand(M,rho);
+
+<span class="comment">% Incorporate marginals</span>
+simulated_r_IBM  = modelInv_IBM(U(:,1));
+simulated_r_GOOG = modelInv_GOOG(U(:,2));
+</pre><h2>Simulate the prices of the assets at t0 + DeltaT<a name="15"></a></h2><pre class="codeinput">simulated_ST_IBM  = S0_IBM*exp(simulated_r_IBM);
+simulated_ST_GOOG = S0_GOOG*exp(simulated_r_GOOG);
+</pre><h2>Simulate the prices of the derivatives at t0 + DeltaT<a name="16"></a></h2><pre class="codeinput">simulated_price_IBM_call = zeros(M,1);
+simulated_price_GOOG_asianCallAM = zeros(M,1);
+<span class="keyword">for</span> m = 1:M
+</pre><pre class="codeinput">    <span class="comment">% disp(M-m) % monitor the number of pending simulations</span>
+</pre><h2>IBM:  Call option<a name="18"></a></h2><pre class="codeinput">    simulated_price_IBM_call(m) = <span class="keyword">...</span>
+        priceEuropeanOption(simulated_ST_IBM(m),r,T,sigma_IBM,payoff_call);
+</pre><h2>GOOG: Call on the arithmetic mean<a name="19"></a></h2><pre class="codeinput">    simulated_price_GOOG_asianCallAM(m) =<span class="keyword">...</span>
+        priceAsianArithmeticMeanCallMC_controlVariate<span class="keyword">...</span>
+        (simulated_ST_GOOG(m),K,r,T,sigma_GOOG,M_AM,N_AM);
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><h2>Simulated portfolio value at t0 + DeltaT<a name="21"></a></h2><pre class="codeinput">simulated_PT = c_IBM_asset        * simulated_ST_IBM         + <span class="keyword">...</span>
+               c_IBM_call         * simulated_price_IBM_call + <span class="keyword">...</span>
+               c_GOOG_asset       * simulated_ST_GOOG        + <span class="keyword">...</span>
+               c_GOOG_asianCallAM * simulated_price_GOOG_asianCallAM;
+</pre><h2>Simulated losses<a name="22"></a></h2><pre class="codeinput">simulated_Loss = -(simulated_PT-P0);
+</pre><h2>Risk measures<a name="23"></a></h2><pre class="codeinput">p         = 0.95;  <span class="comment">% probability level for the risk measures</span>
+VaR       = quantile(simulated_Loss,p)
+indexTail = simulated_Loss &gt; VaR;
+ES        = mean(simulated_Loss(indexTail))
+</pre><pre class="codeoutput">
+VaR =
+
+   9.5488e+04
+
+
+ES =
+
+   1.1222e+05
+
+</pre><h2>Risk measures as a percentage of the current portfolio value<a name="24"></a></h2><pre class="codeinput">100*VaR/P0
+100*ES/P0
+</pre><pre class="codeoutput">
+ans =
+
+   20.9956
+
+
+ans =
+
+   24.6748
+
+</pre><h2>Plot the results<a name="25"></a></h2><pre class="codeinput">figure(1);
+nBins = 50;
+hist(simulated_Loss,nBins);
+hold <span class="string">on</span>;
+plot(VaR,0,<span class="string">'rx'</span>);
+plot(ES,0,<span class="string">'ro'</span>);
+hold <span class="string">off</span>;
+
+legend(<span class="string">'Losses'</span>,<span class="string">'VaR'</span>,<span class="string">'ES'</span>,2);
+</pre><img vspace="5" hspace="5" src="demo_MonteCarloSimulationVaR_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function demo_MonteCarloSimulationVaR
+%% demo_MonteCarloSimulationVaR: Monte Carlo simulation for VaR
+
+%% Load the data
+S = load('closingPrices_IBM_GOOG_SI_2007_07_01_2013_06_30.txt');
+
+%% Select data in the recent past
+N  = 500;
+
+S_IBM   = S(end-N:end,1);
+S0_IBM  = S_IBM(end);
+
+S_GOOG  = S(end-N:end,2);
+S0_GOOG = S_GOOG(end);
+
+
+%% Compute historical log returns for the specified time horizon (DeltaT)
+
+% horizon for the risk measures (VaR, ES)
+horizon = 5;  
+
+indices = N+1:-1:horizon+1;          % overlapping intervals
+% indices = N+1:-horizon:horizon+1;  % non-overlapping intervals
+indices = indices(end:-1:1);
+
+% New sample size
+N = length(indices);
+
+r_IBM  = log(S_IBM(indices)  ./ S_IBM(indices-horizon));
+r_GOOG = log(S_GOOG(indices) ./ S_GOOG(indices-horizon));
+
+%% Student's t fit for the marginals of the log returns
+
+% Degrees of freedom: seed for the optimization
+nu0 = 5; 
+
+% Student's t fit for IBM
+[mu_IBM,sigma_IBM,nu_IBM,modelPdf_IBM,modelCdf_IBM,modelInv_IBM] = ...
+    fit2StudentT(r_IBM,nu0);
+
+% Student's t fit for GOOG
+[mu_GOOG,sigma_GOOG,nu_GOOG,modelPdf_GOOG,modelCdf_GOOG,modelInv_GOOG] = ...
+    fit2StudentT(r_GOOG,nu0);
+
+%% Gaussian copula for the joint distribution of log returns
+
+% Transform to U[0,1] marginals
+u_IBM  = modelCdf_IBM(r_IBM); 
+u_GOOG = modelCdf_GOOG(r_GOOG);
+
+% Gaussian copula fit
+rho = corr([norminv(u_IBM) norminv(u_GOOG)]);
+
+%% Portfolio composition
+c_IBM_asset        = 500;  % IBM shares
+c_GOOG_asset       = 200;  % GOOG shares
+c_IBM_call         = 5000; % European call on IBM
+c_GOOG_asianCallAM = 2000; % Arithmetic mean Asian call on GOOG
+
+%% Portfolio value at t0
+
+%% Value of the European call option on IBM
+r = 0.01;  % risk-free interest rate
+T = 1;     % time to maturity
+K = 180;   % Strike
+
+nDaysInYear = 252;  % number of trading days in a year
+% sigma_IBM   = sqrt(nDaysInYear/horizon)*std(r_IBM); % annualized historical volatity
+sigma_IBM   = 0.16;                                 % implied volatility in a call on IBM  
+
+payoff_call    = @(ST)(max(ST-K,0));
+price_IBM_call = priceEuropeanOption(S0_IBM,r,T,sigma_IBM,payoff_call)
+
+%% Value of an Asian call option on the arithmetic mean of Google
+N_AM = 6;    % Number of monitoring times for the arithmetic mean 
+T    = 0.5;  % Time to maturity
+M_AM = 1e3;  % Number of simulated trajectories
+K    = 880;  % Strike of the Asian arithmetic mean call option
+
+sigma_GOOG   = sqrt(nDaysInYear/horizon)*std(r_GOOG); % annualized historical volatity
+
+[price_GOOG_asianCallAM,stdev_MC] = ...
+    priceAsianArithmeticMeanCallMC_controlVariate(S0_GOOG,K,r,T,sigma_GOOG,M_AM,N_AM)
+
+%% Value of the portfolio at t0
+P0 = c_IBM_asset        * S0_IBM         + ...
+     c_IBM_call         * price_IBM_call + ...
+     c_GOOG_asset       * S0_GOOG        + ...
+     c_GOOG_asianCallAM * price_GOOG_asianCallAM
+ 
+%% Monte Carlo simulation
+
+% Simulate M scenarios
+M = 1e3; 
+
+%% Simulate the log returns from the multivariate model
+
+% Student's t marginals + Gaussian copula
+
+% Gaussian copula sample
+U = gaussianCopulaRand(M,rho);
+
+% Incorporate marginals
+simulated_r_IBM  = modelInv_IBM(U(:,1));
+simulated_r_GOOG = modelInv_GOOG(U(:,2));
+
+%% Simulate the prices of the assets at t0 + DeltaT
+
+simulated_ST_IBM  = S0_IBM*exp(simulated_r_IBM);
+simulated_ST_GOOG = S0_GOOG*exp(simulated_r_GOOG);
+
+%% Simulate the prices of the derivatives at t0 + DeltaT
+
+simulated_price_IBM_call = zeros(M,1);
+simulated_price_GOOG_asianCallAM = zeros(M,1);
+for m = 1:M
+    % disp(M-m) % monitor the number of pending simulations
+    
+    %% IBM:  Call option
+    simulated_price_IBM_call(m) = ...
+        priceEuropeanOption(simulated_ST_IBM(m),r,T,sigma_IBM,payoff_call);
+    
+    %% GOOG: Call on the arithmetic mean
+    simulated_price_GOOG_asianCallAM(m) =...
+        priceAsianArithmeticMeanCallMC_controlVariate...
+        (simulated_ST_GOOG(m),K,r,T,sigma_GOOG,M_AM,N_AM);
+end
+
+%% Simulated portfolio value at t0 + DeltaT
+simulated_PT = c_IBM_asset        * simulated_ST_IBM         + ...
+               c_IBM_call         * simulated_price_IBM_call + ...
+               c_GOOG_asset       * simulated_ST_GOOG        + ...
+               c_GOOG_asianCallAM * simulated_price_GOOG_asianCallAM;
+
+%% Simulated losses
+simulated_Loss = -(simulated_PT-P0);
+
+%% Risk measures 
+p         = 0.95;  % probability level for the risk measures
+VaR       = quantile(simulated_Loss,p)
+indexTail = simulated_Loss > VaR;
+ES        = mean(simulated_Loss(indexTail))
+
+%% Risk measures as a percentage of the current portfolio value
+100*VaR/P0
+100*ES/P0
+
+%% Plot the results
+figure(1);
+nBins = 50;
+hist(simulated_Loss,nBins);
+hold on;
+plot(VaR,0,'rx');
+plot(ES,0,'ro');
+hold off;
+
+legend('Losses','VaR','ES',2);
+
+
+##### SOURCE END #####
+--></body></html>

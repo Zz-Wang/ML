@@ -1,0 +1,164 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demoCode_simpleReturns</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-01-10"><meta name="DC.source" content="demoCode_simpleReturns.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">demoCode_simpleReturns: Properties of returns in a time series</a></li><li><a href="#3">Load the data</a></li><li><a href="#4">D: Number of assets,   N: length of the time series</a></li><li><a href="#5">Compute the asset returns</a></li><li><a href="#6">Build time series of portfolio values</a></li><li><a href="#7">define the composition of the portfolio</a></li><li><a href="#8">compute series of portfolio values</a></li><li><a href="#9">compute the time series of portfolio weights</a></li><li><a href="#10">compute the time series of portfolio returns</a></li><li><a href="#11">An alternative form of computing the portfolio returns</a></li><li><a href="#12">compute the returns of the portfolio from the portfolio weights</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> demoCode_simpleReturns
+</pre><h2>demoCode_simpleReturns: Properties of returns in a time series<a name="2"></a></h2><h2>Load the data<a name="3"></a></h2><pre class="codeinput">S = load(<span class="string">'closingPrices_IBM_GOOG_SI_2007_07_01_2013_06_30.txt'</span>);
+titleText = {<span class="string">'IBM'</span>,<span class="string">'GOOG'</span>,<span class="string">'SI'</span>};
+S = S(1:7,:);  <span class="comment">% Look at a short series of prices for all assets</span>
+
+<span class="comment">% each row corresponds to the time series of prices of an asset</span>
+<span class="comment">% time increases with the index of the columns</span>
+S = S'
+</pre><pre class="codeoutput">
+S =
+
+   94.5000   95.9100   97.2300   98.1100   98.0600   97.7500   98.1800
+  530.3800  534.3400  541.6300  539.4000  542.5600  543.3400  544.4700
+  117.0500  120.9800  120.8700  120.1300  122.1600  118.6500  118.9100
+
+</pre><h2>D: Number of assets,   N: length of the time series<a name="4"></a></h2><pre class="codeinput">[D,N] = size(S);
+</pre><h2>Compute the asset returns<a name="5"></a></h2><pre class="codeinput">R = 100.0*(S(:,2:end)./S(:,1:end-1) - 1.0)
+</pre><pre class="codeoutput">
+R =
+
+    1.4921    1.3763    0.9051   -0.0510   -0.3161    0.4399
+    0.7466    1.3643   -0.4117    0.5858    0.1438    0.2080
+    3.3575   -0.0909   -0.6122    1.6898   -2.8733    0.2191
+
+</pre><h2>Build time series of portfolio values<a name="6"></a></h2><h2>define the composition of the portfolio<a name="7"></a></h2><pre class="codeinput">c = [5; 2; 2];
+</pre><h2>compute series of portfolio values<a name="8"></a></h2><pre class="codeinput">P = c'*S
+</pre><pre class="codeoutput">
+P =
+
+   1.0e+03 *
+
+    1.7674    1.7902    1.8112    1.8096    1.8197    1.8127    1.8177
+
+</pre><h2>compute the time series of portfolio weights<a name="9"></a></h2><pre class="codeinput">w = repmat(c,1,N).*S./repmat(P,D,1)
+</pre><pre class="codeoutput">
+w =
+
+    0.2673    0.2679    0.2684    0.2711    0.2694    0.2696    0.2701
+    0.6002    0.5970    0.5981    0.5962    0.5963    0.5995    0.5991
+    0.1325    0.1352    0.1335    0.1328    0.1343    0.1309    0.1308
+
+</pre><h2>compute the time series of portfolio returns<a name="10"></a></h2><pre class="codeinput">portfolioReturn = 100.0*(P(2:end)./P(1:end-1) - 1.0)
+</pre><pre class="codeoutput">
+portfolioReturn =
+
+    1.2918    1.1708   -0.0850    0.5598   -0.3852    0.2720
+
+</pre><h2>An alternative form of computing the portfolio returns<a name="11"></a></h2><h2>compute the returns of the portfolio from the portfolio weights<a name="12"></a></h2><pre class="codeinput">portfolioReturn_w = sum(w(:,1:end-1).*R)
+</pre><pre class="codeoutput">
+portfolioReturn_w =
+
+    1.2918    1.1708   -0.0850    0.5598   -0.3852    0.2720
+
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function demoCode_simpleReturns
+%% demoCode_simpleReturns: Properties of returns in a time series
+
+%% Load the data 
+
+S = load('closingPrices_IBM_GOOG_SI_2007_07_01_2013_06_30.txt');
+titleText = {'IBM','GOOG','SI'};
+S = S(1:7,:);  % Look at a short series of prices for all assets
+
+% each row corresponds to the time series of prices of an asset
+% time increases with the index of the columns
+S = S' 
+
+%% D: Number of assets,   N: length of the time series
+[D,N] = size(S);
+
+%% Compute the asset returns
+
+R = 100.0*(S(:,2:end)./S(:,1:end-1) - 1.0)
+
+%% Build time series of portfolio values
+
+%% define the composition of the portfolio
+c = [5; 2; 2];
+
+%% compute series of portfolio values 
+P = c'*S       
+
+%% compute the time series of portfolio weights
+w = repmat(c,1,N).*S./repmat(P,D,1)
+
+%% compute the time series of portfolio returns
+portfolioReturn = 100.0*(P(2:end)./P(1:end-1) - 1.0)
+
+%% An alternative form of computing the portfolio returns
+
+%% compute the returns of the portfolio from the portfolio weights
+portfolioReturn_w = sum(w(:,1:end-1).*R)
+
+
+##### SOURCE END #####
+--></body></html>

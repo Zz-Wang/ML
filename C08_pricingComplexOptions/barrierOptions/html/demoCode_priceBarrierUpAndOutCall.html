@@ -1,0 +1,154 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demoCode_priceBarrierUpAndOutCall</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-08-03"><meta name="DC.source" content="demoCode_priceBarrierUpAndOutCall.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">demoCode_priceBarrierUpAndOutCallMC: Black-Scholes price of an up and out barrier call option</a></li><li><a href="#3">Parameters of the Asian call option</a></li><li><a href="#4">Generate M x N samples from N(0,1)</a></li><li><a href="#5">Simulate M trajectories in [t0,t0+T] in N time-steps of size deltaT</a></li><li><a href="#6">Check whether the trajectory never touches the barrier</a></li><li><a href="#7">Compute the payoff for each trajectory</a></li><li><a href="#8">MC estimate of the price and the error of the option</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span>  demoCode_priceBarrierUpAndOutCallMC
+</pre><h2>demoCode_priceBarrierUpAndOutCallMC: Black-Scholes price of an up and out barrier call option<a name="2"></a></h2><h2>Parameters of the Asian call option<a name="3"></a></h2><pre class="codeinput">S0    = 100;   <span class="comment">% initial price</span>
+K     = 95;    <span class="comment">% strike</span>
+B     = 115;   <span class="comment">% barrier level</span>
+r     = 0.05;  <span class="comment">% interest rate</span>
+T     = 1;     <span class="comment">% maturity</span>
+sigma = 0.1;   <span class="comment">% volatility</span>
+</pre><h2>Generate M x N samples from N(0,1)<a name="4"></a></h2><pre class="codeinput">M = 3;         <span class="comment">% number of trajectories</span>
+N = 4;         <span class="comment">% observation times</span>
+X = randn(M,N);
+</pre><h2>Simulate M trajectories in [t0,t0+T] in N time-steps of size deltaT<a name="5"></a></h2><pre class="codeinput">deltaT = T/N;
+S      = cumprod([S0*ones(M,1) exp((r-0.5*sigma^2)*deltaT+sigma*sqrt(deltaT)*X)],2)
+</pre><pre class="codeoutput">
+S =
+
+  100.0000  102.4251  103.7021  108.2379  118.2854
+  100.0000  100.3441   97.2895   99.7481  104.2494
+  100.0000   99.9464  104.2092  108.1367  111.9422
+
+</pre><h2>Check whether the trajectory never touches the barrier<a name="6"></a></h2><pre class="codeinput">indexUnderBarrier = all(S&lt;B,2)
+</pre><pre class="codeoutput">
+indexUnderBarrier =
+
+     0
+     1
+     1
+
+</pre><h2>Compute the payoff for each trajectory<a name="7"></a></h2><pre class="codeinput">ST     = S(:,end)    <span class="comment">% value of S at maturity</span>
+payoff = max(ST-K,0).*indexUnderBarrier
+</pre><pre class="codeoutput">
+ST =
+
+  118.2854
+  104.2494
+  111.9422
+
+
+payoff =
+
+         0
+    9.2494
+   16.9422
+
+</pre><h2>MC estimate of the price and the error of the option<a name="8"></a></h2><pre class="codeinput">discountFactor = exp(-r*T);
+
+price_MC = discountFactor*mean(payoff);
+stdev_MC = discountFactor*std(payoff)/sqrt(M);
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function  demoCode_priceBarrierUpAndOutCallMC
+%% demoCode_priceBarrierUpAndOutCallMC: Black-Scholes price of an up and out barrier call option
+%          
+
+%% Parameters of the Asian call option
+S0    = 100;   % initial price
+K     = 95;    % strike
+B     = 115;   % barrier level
+r     = 0.05;  % interest rate
+T     = 1;     % maturity 
+sigma = 0.1;   % volatility
+
+%% Generate M x N samples from N(0,1)
+M = 3;         % number of trajectories
+N = 4;         % observation times
+X = randn(M,N); 
+
+%% Simulate M trajectories in [t0,t0+T] in N time-steps of size deltaT
+deltaT = T/N;
+S      = cumprod([S0*ones(M,1) exp((r-0.5*sigma^2)*deltaT+sigma*sqrt(deltaT)*X)],2)
+
+%% Check whether the trajectory never touches the barrier
+
+indexUnderBarrier = all(S<B,2)
+
+%% Compute the payoff for each trajectory
+
+ST     = S(:,end)    % value of S at maturity
+payoff = max(ST-K,0).*indexUnderBarrier
+
+%% MC estimate of the price and the error of the option
+discountFactor = exp(-r*T);
+
+price_MC = discountFactor*mean(payoff);
+stdev_MC = discountFactor*std(payoff)/sqrt(M);
+
+##### SOURCE END #####
+--></body></html>

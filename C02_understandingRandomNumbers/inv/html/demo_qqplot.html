@@ -1,0 +1,212 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demo_qqplot</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-12-24"><meta name="DC.source" content="demo_qqplot.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">demo_qqplot: quantile-quantile plot</a></li><li><a href="#3">Load the time series of closing prices for IBM and GOOGLE</a></li><li><a href="#4">Determine whether the returns follow a normal distribution</a></li><li><a href="#5">Determine whether the returns follow a Student's t</a></li><li><a href="#6">Compare with t model</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> demo_qqplot
+</pre><h2>demo_qqplot: quantile-quantile plot<a name="2"></a></h2><h2>Load the time series of closing prices for IBM and GOOGLE<a name="3"></a></h2><pre class="codeinput">data = load(<span class="string">'closingPrices_IBM_GOOG_SI_2007_07_01_2013_06_30.txt'</span>);
+S_GOOG = data(:,2);
+r_GOOG = diff(log(S_GOOG));
+</pre><h2>Determine whether the returns follow a normal distribution<a name="4"></a></h2><pre class="codeinput"><span class="comment">% Compare with normal model</span>
+mu    = mean(r_GOOG);
+sigma = std(r_GOOG);
+
+figure(1); clf
+<span class="comment">% compare pdf</span>
+subplot(1,3,1);
+pdf = @(x)normpdf(x,mu,sigma);
+graphicalComparisonPdf(r_GOOG,pdf)
+
+<span class="comment">% compare cdf</span>
+subplot(1,3,2);
+cdf = @(x)normcdf(x,mu,sigma);
+graphicalComparisonCdf(r_GOOG,cdf)
+
+<span class="comment">% compare quantiles</span>
+subplot(1,3,3);
+qqplot(r_GOOG);
+xlabel(<span class="string">'N(0,1)'</span>);
+ylabel(<span class="string">'r_{GOOG}'</span>);
+title(<span class="string">'qqplot'</span>);
+
+disp(<span class="string">'Press any key to continue'</span>)
+pause
+</pre><pre class="codeoutput">Press any key to continue
+</pre><img vspace="5" hspace="5" src="demo_qqplot_01.png" alt=""> <h2>Determine whether the returns follow a Student's t<a name="5"></a></h2><pre class="codeinput">mu    = 7.5905e-04
+sigma = 0.012315
+nu    = 2.7552
+</pre><pre class="codeoutput">
+mu =
+
+   7.5905e-04
+
+
+sigma =
+
+    0.0123
+
+
+nu =
+
+    2.7552
+
+</pre><h2>Compare with t model<a name="6"></a></h2><pre class="codeinput">figure(2); clf
+
+<span class="comment">% compare pdf</span>
+subplot(1,3,1);
+pdf = @(x)(tpdf((x-mu)/sigma,nu)/sigma);
+graphicalComparisonPdf(r_GOOG,pdf)
+
+<span class="comment">% compare cdf</span>
+subplot(1,3,2);
+cdf = @(x)(tcdf((x-mu)/sigma,nu));
+graphicalComparisonCdf(r_GOOG,cdf)
+
+<span class="comment">% compare quantiles</span>
+subplot(1,3,3);
+<span class="keyword">try</span>
+    <span class="comment">% GNU Octave</span>
+    qqplot((r_GOOG-mu)/sigma,<span class="string">'t'</span>,nu);
+<span class="keyword">catch</span>
+    <span class="comment">% Matlab</span>
+    tPD = ProbDistUnivParam(<span class="string">'tlocationscale'</span>, [0,1,nu]);
+    qqplot((r_GOOG-mu)/sigma,tPD);
+<span class="keyword">end</span>
+xlabel(<span class="string">'t Student'</span>);
+ylabel(<span class="string">'r_{GOOG}'</span>);
+title(<span class="string">'qqplot'</span>);
+</pre><img vspace="5" hspace="5" src="demo_qqplot_02.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function demo_qqplot
+%% demo_qqplot: quantile-quantile plot
+
+%% Load the time series of closing prices for IBM and GOOGLE
+data = load('closingPrices_IBM_GOOG_SI_2007_07_01_2013_06_30.txt');
+S_GOOG = data(:,2);
+r_GOOG = diff(log(S_GOOG));
+
+%% Determine whether the returns follow a normal distribution
+
+% Compare with normal model
+mu    = mean(r_GOOG);
+sigma = std(r_GOOG);
+
+figure(1); clf
+% compare pdf
+subplot(1,3,1);
+pdf = @(x)normpdf(x,mu,sigma);
+graphicalComparisonPdf(r_GOOG,pdf)
+
+% compare cdf
+subplot(1,3,2);
+cdf = @(x)normcdf(x,mu,sigma);
+graphicalComparisonCdf(r_GOOG,cdf)
+
+% compare quantiles
+subplot(1,3,3);
+qqplot(r_GOOG); 
+xlabel('N(0,1)');
+ylabel('r_{GOOG}');
+title('qqplot');
+
+disp('Press any key to continue')
+pause
+
+%% Determine whether the returns follow a Student's t
+
+mu    = 7.5905e-04
+sigma = 0.012315
+nu    = 2.7552
+
+%% Compare with t model
+
+figure(2); clf
+
+% compare pdf
+subplot(1,3,1);
+pdf = @(x)(tpdf((x-mu)/sigma,nu)/sigma);
+graphicalComparisonPdf(r_GOOG,pdf)
+
+% compare cdf
+subplot(1,3,2);
+cdf = @(x)(tcdf((x-mu)/sigma,nu));
+graphicalComparisonCdf(r_GOOG,cdf)
+
+% compare quantiles
+subplot(1,3,3);
+try 
+    % GNU Octave
+    qqplot((r_GOOG-mu)/sigma,'t',nu);
+catch
+    % Matlab
+    tPD = ProbDistUnivParam('tlocationscale', [0,1,nu]);
+    qqplot((r_GOOG-mu)/sigma,tPD);
+end 
+xlabel('t Student');
+ylabel('r_{GOOG}');
+title('qqplot');
+
+##### SOURCE END #####
+--></body></html>

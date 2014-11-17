@@ -1,0 +1,139 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>priceAsianGeometricMeanCall</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-08-21"><meta name="DC.source" content="priceAsianGeometricMeanCall.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">priceAsianGeometricMeanCall: Price of a Asian call option on the geometric mean in the Black-Scholes model</a></li><li><a href="#3">SYNTAX:</a></li><li><a href="#4">INPUT:</a></li><li><a href="#5">OUTPUT:</a></li><li><a href="#6">EXAMPLE:</a></li><li><a href="#7">Auxiliary parameters</a></li><li><a href="#8">Pricing formula</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> price = priceAsianGeometricMeanCall(S0,K,r,T,sigma,N)
+</pre><h2>priceAsianGeometricMeanCall: Price of a Asian call option on the geometric mean in the Black-Scholes model<a name="2"></a></h2><h2>SYNTAX:<a name="3"></a></h2><pre>      price = priceAsianGeometricMeanCall(S0,K,r,T,sigma,N)</pre><h2>INPUT:<a name="4"></a></h2><pre>     S0 : Initial value of the underlying asset
+      K : Strike
+      r : Risk-free interest rate
+      T : Time to expiry
+  sigma : Volatility
+      N : Number of monitoring times</pre><h2>OUTPUT:<a name="5"></a></h2><pre>  price : Price of the option in the Black-Scholes model</pre><h2>EXAMPLE:<a name="6"></a></h2><pre>      S0 = 100; r = 0.05; K = 90; T = 2; sigma = 0.4; N = 24;
+      price = priceAsianGeometricMeanCall(S0,K,r,T,sigma,N)
+      M = 1e6;
+      [price_MC,std_MC] = priceAsianGeometricMeanCallMC(S0,K,r,T,sigma,M,N)</pre><h2>Auxiliary parameters<a name="7"></a></h2><pre class="codeinput">r_GM     = 0.5*(r*(N+1)/N - sigma^2*(1.0-1.0/N^2)/6.0);
+sigma_GM = sigma*sqrt((2.0*N^2 + 3.0*N + 1.0)/(6.0*N^2));
+
+d_plus  = log(S0/(K*exp(-r_GM*T)))/(sigma_GM*sqrt(T)) + sigma_GM*sqrt(T)/2.0;
+d_minus = d_plus - sigma_GM*sqrt(T);
+<span class="comment">%</span>
+<span class="comment">%</span>
+</pre><h2>Pricing formula<a name="8"></a></h2><pre class="codeinput">price = exp(-r*T)*(S0*exp(r_GM*T)*normcdf(d_plus)-K*normcdf(d_minus));
+</pre><pre class="codeoutput">
+price =
+
+  18.200498107337555
+
+
+price_MC =
+
+  18.226991140614867
+
+
+std_MC =
+
+   0.025868880559590
+
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function price = priceAsianGeometricMeanCall(S0,K,r,T,sigma,N)
+%% priceAsianGeometricMeanCall: Price of a Asian call option on the geometric mean in the Black-Scholes model
+%
+%% SYNTAX:
+%        price = priceAsianGeometricMeanCall(S0,K,r,T,sigma,N)
+%
+%% INPUT:
+%       S0 : Initial value of the underlying asset
+%        K : Strike 
+%        r : Risk-free interest rate 
+%        T : Time to expiry 
+%    sigma : Volatility 
+%        N : Number of monitoring times
+%
+%% OUTPUT:
+%    price : Price of the option in the Black-Scholes model  
+%
+%% EXAMPLE:   
+%        S0 = 100; r = 0.05; K = 90; T = 2; sigma = 0.4; N = 24;
+%        price = priceAsianGeometricMeanCall(S0,K,r,T,sigma,N)
+%        M = 1e6;
+%        [price_MC,std_MC] = priceAsianGeometricMeanCallMC(S0,K,r,T,sigma,M,N)
+%          
+
+%% Auxiliary parameters
+r_GM     = 0.5*(r*(N+1)/N - sigma^2*(1.0-1.0/N^2)/6.0); 
+sigma_GM = sigma*sqrt((2.0*N^2 + 3.0*N + 1.0)/(6.0*N^2));
+
+d_plus  = log(S0/(K*exp(-r_GM*T)))/(sigma_GM*sqrt(T)) + sigma_GM*sqrt(T)/2.0; 
+d_minus = d_plus - sigma_GM*sqrt(T);
+%
+%
+%% Pricing formula
+price = exp(-r*T)*(S0*exp(r_GM*T)*normcdf(d_plus)-K*normcdf(d_minus)); 
+
+
+##### SOURCE END #####
+--></body></html>

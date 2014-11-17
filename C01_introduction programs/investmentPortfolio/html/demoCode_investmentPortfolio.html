@@ -1,0 +1,246 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demoCode_investmentPortfolio</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-12-04"><meta name="DC.source" content="demoCode_investmentPortfolio.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">demo_investmentPortfolio: Time series of portfolio values from the series of asset prices (code).</a></li><li><a href="#3">load the data</a></li><li><a href="#4">Each row corresponds to the time series of prices of an asset</a></li><li><a href="#5">D: Number of assets,   N: length of the time series</a></li><li><a href="#6">Plot the time series</a></li><li><a href="#7">normalize the prices so that the initial values are equal</a></li><li><a href="#8">plot the normalized prices of the assets in the portfolio</a></li><li><a href="#9">Build time series of portfolio values</a></li><li><a href="#10">define the composition of the portfolio</a></li><li><a href="#11">compute series of portfolio values</a></li><li><a href="#12">normalize so that the initial values are equal</a></li><li><a href="#13">plot the normalized prices of the assets in the portfolio</a></li><li><a href="#14">Portfolio weights</a></li><li><a href="#15">Compute the time series of portfolio weights</a></li><li><a href="#17">plot the series of portfolio weights</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> demoCode_investmentPortfolio
+</pre><h2>demo_investmentPortfolio: Time series of portfolio values from the series of asset prices (code).<a name="2"></a></h2><pre class="codeinput">format <span class="string">short</span>
+</pre><h2>load the data<a name="3"></a></h2><pre class="codeinput">S = load(<span class="string">'closingPrices_IBM_GOOG_SI_2007_07_01_2013_06_30.txt'</span>);
+S = S(1:7,:);  <span class="comment">% Look at a short series of prices for all assets</span>
+</pre><h2>Each row corresponds to the time series of prices of an asset<a name="4"></a></h2><p>Time increases with the index of the colums</p><pre class="codeinput">S = S'
+</pre><pre class="codeoutput">
+S =
+
+   94.5000   95.9100   97.2300   98.1100   98.0600   97.7500   98.1800
+  530.3800  534.3400  541.6300  539.4000  542.5600  543.3400  544.4700
+  117.0500  120.9800  120.8700  120.1300  122.1600  118.6500  118.9100
+
+</pre><h2>D: Number of assets,   N: length of the time series<a name="5"></a></h2><pre class="codeinput">[D,N] = size(S);
+
+<span class="comment">% start counting at 0</span>
+N = N-1;
+</pre><h2>Plot the time series<a name="6"></a></h2><h2>normalize the prices so that the initial values are equal<a name="7"></a></h2><pre class="codeinput">initialValue = 100.0;
+<span class="keyword">for</span> d = 1:D
+    normalizedS(d,:) = initialValue*S(d,:)/S(d,1);
+<span class="keyword">end</span>
+
+normalizedS
+</pre><pre class="codeoutput">
+normalizedS =
+
+  100.0000  101.4921  102.8889  103.8201  103.7672  103.4392  103.8942
+  100.0000  100.7466  102.1211  101.7007  102.2965  102.4435  102.6566
+  100.0000  103.3575  103.2636  102.6314  104.3657  101.3669  101.5891
+
+</pre><h2>plot the normalized prices of the assets in the portfolio<a name="8"></a></h2><pre class="codeinput">figure(1); clf;
+plot(0:N,normalizedS);
+axis(<span class="string">'tight'</span>)
+xlabel(<span class="string">'time (in days)'</span>);
+legend(<span class="string">'IBM'</span>,<span class="string">'GOOG'</span>,<span class="string">'SI'</span>,0);
+title(<span class="string">'Time series of prices'</span>);
+</pre><img vspace="5" hspace="5" src="demoCode_investmentPortfolio_01.png" alt=""> <h2>Build time series of portfolio values<a name="9"></a></h2><h2>define the composition of the portfolio<a name="10"></a></h2><pre class="codeinput">c = [5; 2; 2];
+</pre><h2>compute series of portfolio values<a name="11"></a></h2><pre class="codeinput">P = c'*S
+</pre><pre class="codeoutput">
+P =
+
+   1.0e+03 *
+
+    1.7674    1.7902    1.8112    1.8096    1.8197    1.8127    1.8177
+
+</pre><h2>normalize so that the initial values are equal<a name="12"></a></h2><pre class="codeinput">normalizedP = initialValue*P/P(1)
+</pre><pre class="codeoutput">
+normalizedP =
+
+  100.0000  101.2918  102.4777  102.3906  102.9637  102.5671  102.8461
+
+</pre><h2>plot the normalized prices of the assets in the portfolio<a name="13"></a></h2><pre class="codeinput">hold <span class="string">on</span>
+plot(0:N,normalizedP,<span class="string">'c'</span>);
+hold <span class="string">off</span>
+
+axis(<span class="string">'tight'</span>)
+legend(<span class="string">'IBM'</span>,<span class="string">'GOOG'</span>,<span class="string">'SI'</span>,<span class="string">'Portfolio'</span>,0);
+xlabel(<span class="string">'time (in days)'</span>);
+title(<span class="string">'Time series of prices'</span>);
+</pre><img vspace="5" hspace="5" src="demoCode_investmentPortfolio_02.png" alt=""> <h2>Portfolio weights<a name="14"></a></h2><h2>Compute the time series of portfolio weights<a name="15"></a></h2><pre class="codeinput">c_repmat = repmat(c,1,N+1)
+S
+P_repmat = repmat(P,D,1)
+</pre><pre class="codeoutput">
+c_repmat =
+
+     5     5     5     5     5     5     5
+     2     2     2     2     2     2     2
+     2     2     2     2     2     2     2
+
+
+S =
+
+   94.5000   95.9100   97.2300   98.1100   98.0600   97.7500   98.1800
+  530.3800  534.3400  541.6300  539.4000  542.5600  543.3400  544.4700
+  117.0500  120.9800  120.8700  120.1300  122.1600  118.6500  118.9100
+
+
+P_repmat =
+
+   1.0e+03 *
+
+    1.7674    1.7902    1.8112    1.8096    1.8197    1.8127    1.8177
+    1.7674    1.7902    1.8112    1.8096    1.8197    1.8127    1.8177
+    1.7674    1.7902    1.8112    1.8096    1.8197    1.8127    1.8177
+
+</pre><pre class="codeinput">w = c_repmat.*S./P_repmat
+</pre><pre class="codeoutput">
+w =
+
+    0.2673    0.2679    0.2684    0.2711    0.2694    0.2696    0.2701
+    0.6002    0.5970    0.5981    0.5962    0.5963    0.5995    0.5991
+    0.1325    0.1352    0.1335    0.1328    0.1343    0.1309    0.1308
+
+</pre><h2>plot the series of portfolio weights<a name="17"></a></h2><pre class="codeinput">figure(2); clf
+plot(0:N,w);
+axis([0 N 0 1])
+title(<span class="string">'Portfolio weights'</span>);
+legend(<span class="string">'IBM'</span>,<span class="string">'GOOG'</span>,<span class="string">'SI'</span>)
+</pre><img vspace="5" hspace="5" src="demoCode_investmentPortfolio_03.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function demoCode_investmentPortfolio
+%% demo_investmentPortfolio: Time series of portfolio values from the series of asset prices (code).
+format short
+
+%% load the data 
+
+S = load('closingPrices_IBM_GOOG_SI_2007_07_01_2013_06_30.txt');
+S = S(1:7,:);  % Look at a short series of prices for all assets
+
+%% Each row corresponds to the time series of prices of an asset
+% Time increases with the index of the colums
+S = S'
+
+%% D: Number of assets,   N: length of the time series
+[D,N] = size(S); 
+
+% start counting at 0
+N = N-1;   
+
+%% Plot the time series
+
+%% normalize the prices so that the initial values are equal
+initialValue = 100.0;
+for d = 1:D
+    normalizedS(d,:) = initialValue*S(d,:)/S(d,1);
+end
+
+normalizedS
+
+%% plot the normalized prices of the assets in the portfolio
+figure(1); clf;
+plot(0:N,normalizedS);
+axis('tight')
+xlabel('time (in days)');
+legend('IBM','GOOG','SI',0);
+title('Time series of prices');
+
+%% Build time series of portfolio values
+
+%% define the composition of the portfolio
+c = [5; 2; 2];
+
+%% compute series of portfolio values 
+P = c'*S       
+
+%% normalize so that the initial values are equal
+normalizedP = initialValue*P/P(1)
+
+%% plot the normalized prices of the assets in the portfolio
+hold on
+plot(0:N,normalizedP,'c');
+hold off
+
+axis('tight')
+legend('IBM','GOOG','SI','Portfolio',0);
+xlabel('time (in days)');
+title('Time series of prices');
+
+%% Portfolio weights
+
+%% Compute the time series of portfolio weights
+
+c_repmat = repmat(c,1,N+1)
+S
+P_repmat = repmat(P,D,1)
+
+
+%%
+w = c_repmat.*S./P_repmat
+
+%% plot the series of portfolio weights
+figure(2); clf
+plot(0:N,w);
+axis([0 N 0 1])
+title('Portfolio weights');
+legend('IBM','GOOG','SI')
+
+
+##### SOURCE END #####
+--></body></html>
